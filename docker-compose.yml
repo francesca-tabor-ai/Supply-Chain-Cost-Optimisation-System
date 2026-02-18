@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL ──────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: scco_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scco
+      POSTGRES_PASSWORD: scco_password
+      POSTGRES_DB: scco_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scco -d scco_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis ───────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: scco_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── Backend API ─────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: scco_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://scco:scco_password@db:5432/scco_db
+      REDIS_URL: redis://redis:6379/0
+      DEBUG: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend   # hot-reload for development
+
+  # ── React Frontend ──────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: scco_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    environment:
+      VITE_API_BASE: http://api:8000
+
+volumes:
+  postgres_data:
