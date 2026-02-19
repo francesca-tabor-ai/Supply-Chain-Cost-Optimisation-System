@@ -1,7 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-ink-900 font-sans;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+  }
+}
+
+@layer components {
+  .gradient-text {
+    background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 40%, #f43f5e 70%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .dot-grid {
+    background-image: radial-gradient(circle, #e4e4ef 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .gradient-bar {
+    background: linear-gradient(90deg, #8b5cf6, #d946ef, #f43f5e, #f59e0b, #8b5cf6);
+    background-size: 300% 100%;
+    animation: gradient-x 5s linear infinite;
+  }
+  .glass {
+    background: rgba(255,255,255,0.80);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.55);
+  }
+}
+
+@layer utilities {
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #c8c8d8; border-radius: 4px; }
 }
